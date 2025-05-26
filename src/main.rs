@@ -1,18 +1,9 @@
-use actix_web::{App, HttpRequest, HttpServer, Responder, web};
+use std::net::TcpListener;
 
-async fn greet(req: HttpRequest) -> impl Responder {
-    let name = req.match_info().get("name").unwrap_or("World");
-    format!("Hello {}!", &name)
-}
+use zero_web::run;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new()
-            .route("/", web::get().to(greet))
-            .route("/{name}", web::get().to(greet))
-    })
-    .bind("127.0.0.1:8000")?
-    .run()
-    .await
+    let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind radom port");
+    run(listener)?.await
 }
