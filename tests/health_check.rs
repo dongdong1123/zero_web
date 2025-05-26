@@ -1,3 +1,4 @@
+use std::net::TcpListener;
 #[tokio::test]
 async fn health_check_works() {
     let adress = spawn_app();
@@ -12,10 +13,50 @@ async fn health_check_works() {
 }
 
 fn spawn_app() -> String {
-    use std::net::TcpListener;
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind radom port");
     let port = listener.local_addr().unwrap().port();
     let server = zero_web::run(listener).expect("Failed to bind adress!");
     let _ = tokio::spawn(server);
     format!("http://127.0.0.1:{}", port)
+}
+
+#[tokio::test]
+async fn subcribe_return_a_200_for_valid_from_data() {
+    let app_adress = spawn_app();
+    let client = reqwest::Client::new();
+    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
+    let response = client
+        .post(&format!("{}/subcriptions", &app_adress))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(body)
+        .send()
+        .await
+        .expect("Failed to execute request!");
+    assert_eq!(200, response.status().as_u16());
+}
+
+#[tokio::test]
+async fn subcribe_return_a_400_when_data_is_missing() {
+    let app_adress = spawn_app();
+    let client = reqwest::Client::new();
+    let test_class = vec![
+        ("name=le%20", "missing the email"),
+        ("email=usrla_le_guin%40gmail.com", "missing the name"),
+        ("", "missing both name and email"),
+    ];
+    for (invalid_body, error_message) in test_class {
+        let response = client
+            .post(&format!("{}/subcriptions", &app_adress))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(invalid_body)
+            .send()
+            .await
+            .expect("Failed to execute request!");
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "The API did not fail with 400 Bad Request when the payload was {}",
+            error_message
+        );
+    }
 }
