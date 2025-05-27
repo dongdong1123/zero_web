@@ -1,23 +1,15 @@
-use std::net::TcpListener;
-#[tokio::test]
-async fn health_check_works() {
-    let adress = spawn_app();
-    let client = reqwest::Client::new();
-    let response = client
-        .get(&format!("{}/health_check", &adress))
-        .send()
-        .await
-        .expect("Failed to excute request.");
-    assert!(response.status().is_success());
-    assert_eq!(Some(0), response.content_length());
+use actix_web::{HttpResponse, web};
+
+use crate::routes::spawn_app;
+
+#[derive(serde::Deserialize)]
+pub struct FromData {
+    email: String,
+    name: String,
 }
 
-fn spawn_app() -> String {
-    let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind radom port");
-    let port = listener.local_addr().unwrap().port();
-    let server = zero_web::run(listener).expect("Failed to bind adress!");
-    let _ = tokio::spawn(server);
-    format!("http://127.0.0.1:{}", port)
+pub async fn subcribe(_from: web::Form<FromData>) -> HttpResponse {
+    HttpResponse::Ok().finish()
 }
 
 #[tokio::test]
