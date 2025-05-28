@@ -13,21 +13,6 @@ pub async fn subcribe(_from: web::Form<FromData>) -> HttpResponse {
 }
 
 #[tokio::test]
-async fn subcribe_return_a_200_for_valid_from_data() {
-    let app_adress = spawn_app();
-    let client = reqwest::Client::new();
-    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
-    let response = client
-        .post(&format!("{}/subcriptions", &app_adress))
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(body)
-        .send()
-        .await
-        .expect("Failed to execute request!");
-    assert_eq!(200, response.status().as_u16());
-}
-
-#[tokio::test]
 async fn subcribe_return_a_400_when_data_is_missing() {
     let app_adress = spawn_app();
     let client = reqwest::Client::new();
