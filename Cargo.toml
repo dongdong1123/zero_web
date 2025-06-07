@@ -10,6 +10,9 @@ path = "src/lib.rs"
 path = "src/main.rs"
 name = "zero_web"
 
+[env]
+RUST_LOG = "trace"
+
 [dependencies]
 config = "0.15.11"
 actix-web = "4"
@@ -17,6 +20,16 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 serde = { version = "1", features = ["derive"] }
 uuid = { version = "1.1.2", features = ["v4"] }
 chrono = "0.4.41"
+# env_logger = "0.11.8"
+# log = "0.4"
+tracing = { version = "0.1.41", features = ["log"] }
+tracing-subscriber = { version = "0.3.19", features = [
+  "env-filter",
+  "registry",
+] }
+tracing-bunyan-formatter = "0.3.10"
+tracing-log = "0.2.0"
+
 
 [dependencies.sqlx]
 version = "0.8.6"

@@ -3,7 +3,7 @@ use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use uuid::Uuid;
 
-use crate::configuration::{self, DatabaseSettings, get_configuration};
+use crate::configuration::{DatabaseSettings, get_configuration};
 use crate::startup;
 
 pub struct TestApp {
